@@ -1,0 +1,103 @@
+section .data
+    msg1 db "Enter first number: ",0
+    msg2 db "Enter second number: ",0
+    resMsg db "Sum is: ",0
+    newline db 10,0
+
+section .bss
+    num1 resb 10
+    num2 resb 10
+    res  resb 20
+
+section .text
+    global _start
+
+_start:
+    ; Prompt first number
+    mov rax,1
+    mov rdi,1
+    mov rsi,msg1
+    mov rdx,19
+    syscall
+
+    ; Read first number
+    mov rax,0
+    mov rdi,0
+    mov rsi,num1
+    mov rdx,10
+    syscall
+
+    ; Convert first number ASCII -> integer
+    mov rbx,0
+    mov rcx,num1
+convert1:
+    movzx rdx,byte [rcx]
+    cmp dl,10
+    je done1
+    sub dl,'0'
+    imul rbx,rbx,10
+    add rbx,rdx
+    inc rcx
+    jmp convert1
+done1:
+    mov r12,rbx
+
+    ; Prompt second number
+    mov rax,1
+    mov rdi,1
+    mov rsi,msg2
+    mov rdx,20
+    syscall
+
+    ; Read second number
+    mov rax,0
+    mov rdi,0
+    mov rsi,num2
+    mov rdx,10
+    syscall
+
+    ; Convert second number ASCII -> integer
+    mov rbx,0
+    mov rcx,num2
+convert2:
+    movzx rdx,byte [rcx]
+    cmp dl,10
+    je done2
+    sub dl,'0'
+    imul rbx,rbx,10
+    add rbx,rdx
+    inc rcx
+    jmp convert2
+done2:
+    mov r13,rbx
+
+    ; Sum numbers
+    mov rax,r12
+    add rax,r13
+
+    ; Convert result integer -> ASCII
+    mov rcx,res
+    add rax,'0'
+    mov [rcx], al
+    mov byte [rcx+1], 10
+
+    ; Print result message
+    mov rax,1
+    mov rdi,1
+    mov rsi,resMsg
+    mov rdx,8
+    syscall
+
+    ; Print result
+    mov rax,1
+    mov rdi,1
+    mov rsi,res
+    mov rdx,2
+    syscall
+
+    ; Exit
+    mov rax,60
+    xor rdi,rdi
+    syscall
+
+    syscall
